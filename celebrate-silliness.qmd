@@ -4,7 +4,7 @@ format: html
 ---
 
 ```{r}
-pacman::p_load(tidyverse, OregonTrail, ggChernoff, creepr)
+pacman::p_load(OregonTrail, ggChernoff, ggplot2, cowplot, grid, gridExtra, creepr)
 ```
 
 ## Oregon Trail
@@ -21,24 +21,46 @@ https://gist.github.com/baptiste/d4abfa8a6c095d659f8879af5ad9531b
 ```{r}
 load("data/happiness.rda")
 
-happiness |> 
-  count(Time)
-
 happy <- happiness |> 
   filter(Time == 2016) |> 
 ggplot(aes(x = GDP, y = Health, smile = Happiness, brow = Corruption)) + 
-  geom_chernoff(aes(fill = Region)) +
+  geom_chernoff(aes(fill = Region), size = 10) +
   scale_fill_manual(values = c("#fbf8cc", "#fde4cf",
                         "#ffcfd2", "#f1c0e8", "#cfbaf0", "#a3c4f3", "#90dbf4", "#8eecf5", "#98f5e1", "#b9fbc0")
                       ) +
   theme_minimal() + 
   theme(legend.text = element_text(size=10),
         axis.text = element_text(size = 15),
-        axis.title = element_text(size = 15))
+        axis.title = element_text(size = 15),
+        legend.position = "none") 
 
-happy
+# Extract legend
+w_legend <- happiness |> 
+  filter(Time == 2016) |> 
+ggplot(aes(x = GDP, y = Health, smile = Happiness, brow = Corruption)) + 
+  geom_chernoff(aes(fill = Region), size = 5) +
+  scale_fill_manual(values = c("#fbf8cc", "#fde4cf",
+                        "#ffcfd2", "#f1c0e8", "#cfbaf0", "#a3c4f3", "#90dbf4", "#8eecf5", "#98f5e1", "#b9fbc0")
+                      ) +
+  theme_minimal() + 
+  theme(legend.text = element_text(size=10),
+        axis.text = element_text(size = 15),
+        axis.title = element_text(size = 15),
+  )
 
-ggsave("output/happy.png", device = "png", width = 12, height = 7) 
+ggsave("output/happy.png", device = "png", width = 8.5, height = 6) 
+
+g_legend <- function(a.gplot){ 
+    tmp <- ggplot_gtable(ggplot_build(a.gplot)) 
+    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box") 
+    legend <- tmp$grobs[[leg]] 
+    legend
+} 
+
+legend <- g_legend(w_legend) 
+
+grid.newpage()
+grid.draw(legend) 
 ```
 
 ## Pacman
@@ -54,8 +76,6 @@ install.packages('audio')
 
 # Grab a copy of the pacman game code by cloning the repository
 system("git clone https://github.com/coolbutuseless/pacman.git")
-
-
 
 # Change into the source code directory and run
 setwd('pacman')
