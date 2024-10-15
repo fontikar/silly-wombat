@@ -1,0 +1,71 @@
+---
+title: "silly-wombat"
+format: html
+---
+
+```{r}
+pacman::p_load(tidyverse, OregonTrail, ggChernoff, creepr)
+```
+
+## Oregon Trail
+
+```{r}
+play()
+```
+
+
+## gg_chernoff
+
+https://gist.github.com/baptiste/d4abfa8a6c095d659f8879af5ad9531b
+
+```{r}
+load("data/happiness.rda")
+
+happiness |> 
+  count(Time)
+
+happy <- happiness |> 
+  filter(Time == 2016) |> 
+ggplot(aes(x = GDP, y = Health, smile = Happiness, brow = Corruption)) + 
+  geom_chernoff(aes(fill = Region)) +
+  scale_fill_manual(values = c("#fbf8cc", "#fde4cf",
+                        "#ffcfd2", "#f1c0e8", "#cfbaf0", "#a3c4f3", "#90dbf4", "#8eecf5", "#98f5e1", "#b9fbc0")
+                      ) +
+  theme_minimal() + 
+  theme(legend.text = element_text(size=10),
+        axis.text = element_text(size = 15),
+        axis.title = element_text(size = 15))
+
+happy
+
+ggsave("output/happy.png", device = "png", width = 12, height = 7) 
+```
+
+## Pacman
+
+```{r}
+library(remotes)
+
+# Packages required for interactive rendering
+remotes::install_github("coolbutuseless/eventloop")
+remotes::install_github("coolbutuseless/nara")
+
+install.packages('audio')
+
+# Grab a copy of the pacman game code by cloning the repository
+system("git clone https://github.com/coolbutuseless/pacman.git")
+
+
+
+# Change into the source code directory and run
+setwd('pacman')
+source('game.R')
+```
+
+## creepr
+https://github.com/jcken95/creepr
+
+```{r}
+creepr::creepr("strings")
+```
+
